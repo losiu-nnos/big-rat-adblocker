@@ -17,7 +17,7 @@
 // ==/UserScript==
 
 (function () {
-  'use strict'; // not an update test
+  'use strict';
 
   const bigrat = 'https://bigrat.monster/media/bigrat_full.jpg';
   const blacklist = 'https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt';
@@ -25,14 +25,79 @@
   let listReady = false;
   const pendingElements = [];
 
+  const POPUP_COOLDOWN_MS = 30 * 60 * 1000;
+
+  function showUpdatePopup(version) {
+    if (Date.now() - GM_getValue('lastPopupDismissed', 0) < POPUP_COOLDOWN_MS) return;
+
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+      position:fixed;inset:0;z-index:2147483647;
+      display:flex;align-items:center;justify-content:center;
+      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+      background:rgba(0,0,0,0.45);
+    `;
+
+    const dismiss = () => {
+      GM_setValue('lastPopupDismissed', Date.now());
+      overlay.remove();
+    };
+
+    const box = document.createElement('div');
+    box.style.cssText = `
+      width:500px;height:500px;
+      background:#1a1a1a;border:1px solid #333;border-radius:16px;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      position:relative;box-shadow:0 8px 48px rgba(0,0,0,0.7);
+      font-family:sans-serif;color:#fff;
+    `;
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '\u2715';
+    closeBtn.style.cssText = `
+      position:absolute;top:16px;right:16px;
+      background:none;border:none;color:#aaa;font-size:20px;
+      cursor:pointer;line-height:1;padding:4px 8px;border-radius:6px;
+      transition:color .15s,background .15s;
+    `;
+    closeBtn.onmouseenter = () => { closeBtn.style.color = '#fff'; closeBtn.style.background = '#333'; };
+    closeBtn.onmouseleave = () => { closeBtn.style.color = '#aaa'; closeBtn.style.background = 'none'; };
+    closeBtn.onclick = dismiss;
+
+    const rat = document.createElement('img');
+    rat.src = bigrat;
+    rat._ratified = true;
+    rat.style.cssText = 'width:180px;height:180px;object-fit:contain;margin-bottom:28px;border-radius:12px;';
+
+    const msg = document.createElement('p');
+    msg.style.cssText = 'margin:0 0 24px;font-size:18px;font-weight:600;text-align:center;line-height:1.4;padding:0 32px;';
+    msg.textContent = `Please update to version ${version}`;
+
+    const updateBtn = document.createElement('button');
+    updateBtn.textContent = 'Update now';
+    updateBtn.style.cssText = `
+      background:#e8a000;color:#000;border:none;border-radius:8px;
+      padding:12px 32px;font-size:15px;font-weight:700;cursor:pointer;
+      transition:background .15s;
+    `;
+    updateBtn.onmouseenter = () => { updateBtn.style.background = '#ffb700'; };
+    updateBtn.onmouseleave = () => { updateBtn.style.background = '#e8a000'; };
+    updateBtn.onclick = () => {
+      window.open(GM_info.script.downloadURL || GM_info.script.updateURL, '_blank');
+      dismiss();
+    };
+
+    box.appendChild(closeBtn);
+    box.appendChild(rat);
+    box.appendChild(msg);
+    box.appendChild(updateBtn);
+    overlay.appendChild(box);
+    document.documentElement.appendChild(overlay);
+  }
+
   function checkForUpdates() {
     const updateURL = GM_info.script.updateURL;
     if (!updateURL) return;
-
-    const lastCheck = GM_getValue('lastUpdateCheck', 0);
-    const oneDayMs = 1 * 60 * 1000;
-    if (Date.now() - lastCheck < oneDayMs) return;
-
     GM_xmlhttpRequest({
       method: 'GET',
       url: updateURL,
@@ -41,18 +106,9 @@
         const match = res.responseText.match(/@version\s+([\d.]+)/);
         if (!match) return;
         const latest = match[1].split('.').map(Number);
-        const current = GM_info.script.version.split('.').map(Number);
+        const current = GM_info.script.version.replace(/^v/, '').split('.').map(Number);
         const isNewer = latest.some((n, i) => n > (current[i] || 0));
-        GM_setValue('lastUpdateCheck', Date.now());
-        if (isNewer) {
-          GM_notification({
-            title: '🐀 Big Rat Ad Replacer',
-            text: `v${match[1]} is available! Click to update.`,
-            onclick() {
-              window.open(GM_info.script.downloadURL || updateURL, '_blank');
-            },
-          });
-        }
+        if (isNewer) showUpdatePopup(match[1]);
       },
     });
   }
@@ -164,7 +220,7 @@
     rat.src = bigrat;
     rat._ratified = true;
     const cs = window.getComputedStyle(el);
-    const w = el.getAttribute('width')  || cs.width  || '100%';
+    const w = el.getAttribute('width') || cs.width || '100%';
     const h = el.getAttribute('height') || cs.height || '100%';
     rat.style.cssText = `width:${w};height:${h};object-fit:contain;display:block;visibility:visible;opacity:1;`;
     return rat;
@@ -174,10 +230,7 @@
     if (el._ratified) return;
     el._ratified = true;
 
-    if (isFullscreen(el)) {
-      el.remove();
-      return;
-    }
+    if (isFullscreen(el)) { el.remove(); return; }
 
     const tag = el.tagName.toLowerCase();
 
@@ -288,9 +341,11 @@
     onerror() { console.warn('[BigRat] Network error fetching blacklist.'); },
   });
 
-  document.addEventListener('DOMContentLoaded', () => { if (listReady) sweep(); });
+  document.addEventListener('DOMContentLoaded', () => {
+    if (listReady) sweep();
+    checkForUpdates();
+    setInterval(checkForUpdates, 30 * 60 * 1000);
+  });
   window.addEventListener('load', () => { if (listReady) sweep(); });
-
-  checkForUpdates();
 
 })();
