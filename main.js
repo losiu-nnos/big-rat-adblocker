@@ -5,41 +5,41 @@
 // @description  biig rat
 // @author       Iunno
 // @match        *://*/*
-// @exclude https://www.google.com/recaptcha/*
-// @exclude https://recaptcha.net/recaptcha/*
-// @exclude https://www.recaptcha.net/recaptcha/*
-// @exclude https://api2.recaptcha.net/*
-// @exclude https://hcaptcha.com/*
-// @exclude https://www.hcaptcha.com/*
-// @exclude https://newassets.hcaptcha.com/*
-// @exclude https://imgs.hcaptcha.com/*
-// @exclude https://js.hcaptcha.com/*
-// @exclude https://api.hcaptcha.com/*
-// @exclude https://accounts.hcaptcha.com/*
-// @exclude https://funcaptcha.com/*
-// @exclude https://www.funcaptcha.com/*
-// @exclude https://client-api.arkoselabs.com/*
-// @exclude https://api.funcaptcha.com/*
-// @exclude https://roblox-api.arkoselabs.com/*
-// @exclude https://iframe.arkoselabs.com/*
-// @exclude https://turnstile.cloudflare.com/*
-// @exclude https://challenges.cloudflare.com/*
-// @exclude https://captcha.qcloud.com/*
-// @exclude https://geo.captcha-delivery.com/*
-// @exclude https://capgoo.com/*
-// @exclude https://api.capmonster.cloud/*
-// @exclude https://2captcha.com/*
-// @exclude https://www.2captcha.com/*
-// @exclude https://anti-captcha.com/*
-// @exclude https://www.anti-captcha.com/*
-// @exclude https://azcaptcha.com/*
-// @exclude https://deathbycaptcha.com/*
-// @exclude https://www.deathbycaptcha.com/*
-// @exclude https://captchaai.com/*
-// @exclude https://nopecha.com/*
-// @exclude https://www.nopecha.com/*
-// @exclude https://solver.ninja/*
-// @exclude https://captcha.com/*
+// @exclude      https://www.google.com/recaptcha/*
+// @exclude      https://recaptcha.net/recaptcha/*
+// @exclude      https://www.recaptcha.net/recaptcha/*
+// @exclude      https://api2.recaptcha.net/*
+// @exclude      https://hcaptcha.com/*
+// @exclude      https://www.hcaptcha.com/*
+// @exclude      https://newassets.hcaptcha.com/*
+// @exclude      https://imgs.hcaptcha.com/*
+// @exclude      https://js.hcaptcha.com/*
+// @exclude      https://api.hcaptcha.com/*
+// @exclude      https://accounts.hcaptcha.com/*
+// @exclude      https://funcaptcha.com/*
+// @exclude      https://www.funcaptcha.com/*
+// @exclude      https://client-api.arkoselabs.com/*
+// @exclude      https://api.funcaptcha.com/*
+// @exclude      https://roblox-api.arkoselabs.com/*
+// @exclude      https://iframe.arkoselabs.com/*
+// @exclude      https://turnstile.cloudflare.com/*
+// @exclude      https://challenges.cloudflare.com/*
+// @exclude      https://captcha.qcloud.com/*
+// @exclude      https://geo.captcha-delivery.com/*
+// @exclude      https://capgoo.com/*
+// @exclude      https://api.capmonster.cloud/*
+// @exclude      https://2captcha.com/*
+// @exclude      https://www.2captcha.com/*
+// @exclude      https://anti-captcha.com/*
+// @exclude      https://www.anti-captcha.com/*
+// @exclude      https://azcaptcha.com/*
+// @exclude      https://deathbycaptcha.com/*
+// @exclude      https://www.deathbycaptcha.com/*
+// @exclude      https://captchaai.com/*
+// @exclude      https://nopecha.com/*
+// @exclude      https://www.nopecha.com/*
+// @exclude      https://solver.ninja/*
+// @exclude      https://captcha.com/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_notification
 // @grant        GM_getValue
@@ -73,101 +73,36 @@
 
   const COOLDOWN_MS = 30 * 60 * 1000;
   let updateInterval = null;
-  let popupOpen = false;
-
-  function startCooldown() {
-    setTimeout(() => {
-      updateInterval = setInterval(fetchAndCheck, 30 * 1000);
-    }, COOLDOWN_MS);
-  }
-
-  function showUpdatePopup(version) {
-    if (popupOpen) return;
-    popupOpen = true;
-
-    clearInterval(updateInterval);
-    updateInterval = null;
-
-    const overlay = document.createElement('div');
-    overlay.style.cssText = `
-      position:fixed;inset:0;z-index:2147483647;
-      display:flex;align-items:center;justify-content:center;
-      backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-      background:rgba(0,0,0,0.45);
-    `;
-
-    const dismiss = () => {
-      popupOpen = false;
-      overlay.remove();
-      startCooldown();
-    };
-
-    const box = document.createElement('div');
-    box.style.cssText = `
-      width:500px;height:500px;
-      background:#1a1a1a;border:1px solid #333;border-radius:16px;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      position:relative;box-shadow:0 8px 48px rgba(0,0,0,0.7);
-      font-family:sans-serif;color:#fff;
-    `;
-
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = '\u2715';
-    closeBtn.style.cssText = `
-      position:absolute;top:16px;right:16px;
-      background:none;border:none;color:#aaa;font-size:20px;
-      cursor:pointer;line-height:1;padding:4px 8px;border-radius:6px;
-      transition:color .15s,background .15s;
-    `;
-    closeBtn.onmouseenter = () => { closeBtn.style.color = '#fff'; closeBtn.style.background = '#333'; };
-    closeBtn.onmouseleave = () => { closeBtn.style.color = '#aaa'; closeBtn.style.background = 'none'; };
-    closeBtn.onclick = dismiss;
-
-    const rat = document.createElement('img');
-    rat.src = bigrat;
-    rat._ratified = true;
-    rat.style.cssText = 'width:180px;height:180px;object-fit:contain;margin-bottom:28px;border-radius:12px;';
-
-    const msg = document.createElement('p');
-    msg.style.cssText = 'margin:0 0 24px;font-size:18px;font-weight:600;text-align:center;line-height:1.4;padding:0 32px;';
-    msg.textContent = `Please update to version ${version}`;
-
-    const updateBtn = document.createElement('button');
-    updateBtn.textContent = 'Update now';
-    updateBtn.style.cssText = `
-      background:#e8a000;color:#000;border:none;border-radius:8px;
-      padding:12px 32px;font-size:15px;font-weight:700;cursor:pointer;
-      transition:background .15s;
-    `;
-    updateBtn.onmouseenter = () => { updateBtn.style.background = '#ffb700'; };
-    updateBtn.onmouseleave = () => { updateBtn.style.background = '#e8a000'; };
-    updateBtn.onclick = () => {
-      window.open(GM_info.script.downloadURL || GM_info.script.updateURL, '_blank');
-      dismiss();
-    };
-
-    box.appendChild(closeBtn);
-    box.appendChild(rat);
-    box.appendChild(msg);
-    box.appendChild(updateBtn);
-    overlay.appendChild(box);
-    document.documentElement.appendChild(overlay);
-  }
+  let notified = false;
 
   function fetchAndCheck() {
     const updateURL = GM_info.script.updateURL;
-    if (!updateURL || popupOpen) return;
+    const downloadURL = GM_info.script.downloadURL || updateURL;
+    if (!updateURL || notified) return;
     GM_xmlhttpRequest({
       method: 'GET',
       url: updateURL,
       onload(res) {
         if (res.status !== 200) return;
         const match = res.responseText.match(/@version\s+([\d.]+)/);
-        if (!match) return;
+        if (!match || notified) return;
         const latest = match[1].split('.').map(Number);
         const current = GM_info.script.version.replace(/^v/, '').split('.').map(Number);
-        const isNewer = latest.some((n, i) => n > (current[i] || 0));
-        if (isNewer) showUpdatePopup(match[1]);
+        if (!latest.some((n, i) => n > (current[i] || 0))) return;
+        notified = true;
+        clearInterval(updateInterval);
+        updateInterval = null;
+        GM_openInTab(downloadURL, { active: true, insert: true });
+        GM_notification({
+          title: '🐀 Big Rat Ad Replacer',
+          text: `v${match[1]} is available — install tab opened.`,
+          timeout: 8000,
+          onclick() { GM_openInTab(downloadURL, { active: true }); },
+        });
+        setTimeout(() => {
+          notified = false;
+          updateInterval = setInterval(fetchAndCheck, 30 * 1000);
+        }, COOLDOWN_MS);
       },
     });
   }
