@@ -30,7 +30,7 @@
     if (!updateURL) return;
 
     const lastCheck = GM_getValue('lastUpdateCheck', 0);
-    const oneDayMs = 5 * 60 * 1000;
+    const oneDayMs = 1 * 60 * 1000;
     if (Date.now() - lastCheck < oneDayMs) return;
 
     GM_xmlhttpRequest({
