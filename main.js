@@ -16,7 +16,7 @@
 // @run-at       document-start
 // ==/UserScript==
 
-(function () { // update testttt
+(function () {
   'use strict';
 
   const bigrat = 'https://bigrat.monster/media/bigrat_full.jpg';
@@ -30,7 +30,7 @@
     if (!updateURL) return;
 
     const lastCheck = GM_getValue('lastUpdateCheck', 0);
-    const oneDayMs = 24 * 60 * 60 * 1000;
+    const oneDayMs = 5 * 60 * 1000;
     if (Date.now() - lastCheck < oneDayMs) return;
 
     GM_xmlhttpRequest({
