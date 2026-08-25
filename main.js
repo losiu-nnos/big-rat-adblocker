@@ -1,39 +1,18 @@
 // ==UserScript==
-// @name         big rat = no ad
+// @name         Big Rat Ad Replacer
 // @namespace    http://tampermonkey.net/
-// @version      v1.0
-// @description  biig rat
-// @author       iunno
+// @version      7.0.0
+// @description  Replaces ads with a big rat. You're welcome.
+// @author       You
 // @match        *://*/*
-// @exclude https://www.google.com/recaptcha/*
-// @exclude https://recaptcha.net/recaptcha/*
-// @exclude https://www.recaptcha.net/recaptcha/*
-// @exclude https://api2.recaptcha.net/*
-// @exclude https://hcaptcha.com/*
-// @exclude https://www.hcaptcha.com/*
-// @exclude https://newassets.hcaptcha.com/*
-// @exclude https://imgs.hcaptcha.com/*
-// @exclude https://js.hcaptcha.com/*
-// @exclude https://api.hcaptcha.com/*
-// @exclude https://accounts.hcaptcha.com/*
-// @exclude https://funcaptcha.com/*
-// @exclude https://www.funcaptcha.com/*
-// @exclude https://client-api.arkoselabs.com/*
-// @exclude https://api.funcaptcha.com/*
-// @exclude https://roblox-api.arkoselabs.com/*
-// @exclude https://iframe.arkoselabs.com/*
-// @exclude https://turnstile.cloudflare.com/*
-// @exclude https://challenges.cloudflare.com/*
-// @exclude https://captcha.qcloud.com/*
-// @exclude https://geo.captcha-delivery.com/*
-// @exclude https://capgoo.com/*
-// @exclude https://api.capmonster.cloud/*
-// @exclude https://2captcha.com/*
-// @exclude https://www.2captcha.com/*
-// @exclude https://anti-captcha.com/*
-// @exclude https://captcha.com/*
 // @grant        GM_xmlhttpRequest
+// @grant        GM_notification
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @grant        GM_info
 // @connect      raw.githubusercontent.com
+// @updateURL    https://github.com/losiu-nnos/big-rat-adblocker/blob/main/main.js
+// @downloadURL  https://github.com/losiu-nnos/big-rat-adblocker/blob/main/main.js
 // @run-at       document-start
 // ==/UserScript==
 
@@ -42,6 +21,41 @@
 
   const bigrat = 'https://bigrat.monster/media/bigrat_full.jpg';
   const blacklist = 'https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt';
+  const blockedDomains = new Set();
+  let listReady = false;
+  const pendingElements = [];
+
+  function checkForUpdates() {
+    const updateURL = GM_info.script.updateURL;
+    if (!updateURL) return;
+
+    const lastCheck = GM_getValue('lastUpdateCheck', 0);
+    const oneDayMs = 24 * 60 * 60 * 1000;
+    if (Date.now() - lastCheck < oneDayMs) return;
+
+    GM_xmlhttpRequest({
+      method: 'GET',
+      url: updateURL,
+      onload(res) {
+        if (res.status !== 200) return;
+        const match = res.responseText.match(/@version\s+([\d.]+)/);
+        if (!match) return;
+        const latest = match[1].split('.').map(Number);
+        const current = GM_info.script.version.split('.').map(Number);
+        const isNewer = latest.some((n, i) => n > (current[i] || 0));
+        GM_setValue('lastUpdateCheck', Date.now());
+        if (isNewer) {
+          GM_notification({
+            title: '🐀 Big Rat Ad Replacer',
+            text: `v${match[1]} is available! Click to update.`,
+            onclick() {
+              window.open(GM_info.script.downloadURL || updateURL, '_blank');
+            },
+          });
+        }
+      },
+    });
+  }
 
   function looksLikeAd(el) {
     const attrs = [
@@ -83,7 +97,7 @@
 
     const text = attrs.join(' ');
 
-    const adPatterns = [
+    return [
       /\bad(s|vert|vertisement|vertising)?\b/i,
       /\bad[-_ ]?(slot|unit|container|wrapper|banner|box|frame|block)\b/i,
       /\b(advert|advertisement|advertising|advertiser)\b/i,
@@ -118,14 +132,8 @@
       /(^|[-_])sponsor(ed)?([-_]|$)/i,
       /(^|[-_])promotion([-_]|$)/i,
       /(^|[-_])commercial([-_]|$)/i,
-    ];
-
-    return adPatterns.some(p => p.test(text));
+    ].some(p => p.test(text));
   }
-
-  const blockedDomains = new Set();
-  let listReady = false;
-  const pendingElements = [];
 
   function getHostname(url) {
     try { return new URL(url).hostname.toLowerCase().replace(/^www\./, ''); }
@@ -143,6 +151,14 @@
     return false;
   }
 
+  function isFullscreen(el) {
+    try {
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) return false;
+      return (r.width / window.innerWidth) > 0.75 && (r.height / window.innerHeight) > 0.75;
+    } catch { return false; }
+  }
+
   function makeRat(el) {
     const rat = document.createElement('img');
     rat.src = bigrat;
@@ -158,6 +174,11 @@
     if (el._ratified) return;
     el._ratified = true;
 
+    if (isFullscreen(el)) {
+      el.remove();
+      return;
+    }
+
     const tag = el.tagName.toLowerCase();
 
     if (tag === 'img') {
@@ -165,10 +186,8 @@
       el.srcset = '';
       ['srcset', 'data-src', 'data-lazy-src', 'data-original'].forEach(a => el.removeAttribute(a));
       el.style.cssText += ';display:block!important;visibility:visible!important;opacity:1!important;';
-
     } else if (tag === 'iframe' || tag === 'video') {
       el.parentNode && el.parentNode.replaceChild(makeRat(el), el);
-
     } else {
       el.innerHTML = '';
       const rat = document.createElement('img');
@@ -181,16 +200,12 @@
 
   function checkElement(el) {
     if (!el || !el.tagName || el._ratified) return;
-
     const src = el.src
       || el.getAttribute('data-src')
       || el.getAttribute('data-lazy-src')
       || el.getAttribute('data-original')
       || '';
-
-    if ((src && isDomainBlocked(src)) || looksLikeAd(el)) {
-      ratify(el);
-    }
+    if ((src && isDomainBlocked(src)) || looksLikeAd(el)) ratify(el);
   }
 
   function sweep(root) {
@@ -259,7 +274,7 @@
         blockedDomains.add(domain.replace(/^www\./, ''));
     }
     listReady = true;
-    console.log(`[BigRat] ${blockedDomains.size} blocked domains + keyword heuristics active 🐀`);
+    console.log(`[BigRat] ${blockedDomains.size} blocked domains active 🐀`);
     drainQueue();
   }
 
@@ -275,5 +290,7 @@
 
   document.addEventListener('DOMContentLoaded', () => { if (listReady) sweep(); });
   window.addEventListener('load', () => { if (listReady) sweep(); });
+
+  checkForUpdates();
 
 })();
