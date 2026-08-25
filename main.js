@@ -20,15 +20,27 @@
   'use strict';
 
   const bigrat = 'https://bigrat.monster/media/bigrat_full.jpg';
-  const blacklist = 'https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt'; // this is a test
+  const blacklist = 'https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt';
   const blockedDomains = new Set();
   let listReady = false;
   const pendingElements = [];
 
-  const POPUP_COOLDOWN_MS = 30 * 60 * 1000;
+  const COOLDOWN_MS = 30 * 60 * 1000;
+  let updateInterval = null;
+  let popupOpen = false;
+
+  function startCooldown() {
+    setTimeout(() => {
+      updateInterval = setInterval(fetchAndCheck, 30 * 1000);
+    }, COOLDOWN_MS);
+  }
 
   function showUpdatePopup(version) {
-    if (Date.now() - GM_getValue('lastPopupDismissed', 0) < POPUP_COOLDOWN_MS) return;
+    if (popupOpen) return;
+    popupOpen = true;
+
+    clearInterval(updateInterval);
+    updateInterval = null;
 
     const overlay = document.createElement('div');
     overlay.style.cssText = `
@@ -39,8 +51,9 @@
     `;
 
     const dismiss = () => {
-      GM_setValue('lastPopupDismissed', Date.now());
+      popupOpen = false;
       overlay.remove();
+      startCooldown();
     };
 
     const box = document.createElement('div');
@@ -95,9 +108,9 @@
     document.documentElement.appendChild(overlay);
   }
 
-  function checkForUpdates() {
+  function fetchAndCheck() {
     const updateURL = GM_info.script.updateURL;
-    if (!updateURL) return;
+    if (!updateURL || popupOpen) return;
     GM_xmlhttpRequest({
       method: 'GET',
       url: updateURL,
@@ -111,6 +124,11 @@
         if (isNewer) showUpdatePopup(match[1]);
       },
     });
+  }
+
+  function checkForUpdates() {
+    fetchAndCheck();
+    updateInterval = setInterval(fetchAndCheck, 30 * 1000);
   }
 
   function looksLikeAd(el) {
@@ -344,7 +362,6 @@
   document.addEventListener('DOMContentLoaded', () => {
     if (listReady) sweep();
     checkForUpdates();
-    setInterval(checkForUpdates, 30 * 60 * 1000);
   });
   window.addEventListener('load', () => { if (listReady) sweep(); });
 
