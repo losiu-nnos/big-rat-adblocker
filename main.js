@@ -17,7 +17,7 @@
 // ==/UserScript==
 
 (function () {
-  'use strict';
+  'use strict'; // not an update test
 
   const bigrat = 'https://bigrat.monster/media/bigrat_full.jpg';
   const blacklist = 'https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt';
