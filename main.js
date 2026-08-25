@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         big rat = no ad
 // @namespace    http://tampermonkey.net/
-// @version      v1.2
+// @version      v1.3
 // @description  biig rat
 // @author       Iunno
 // @match        *://*/*
@@ -20,7 +20,7 @@
   'use strict';
 
   const bigrat = 'https://bigrat.monster/media/bigrat_full.jpg';
-  const blacklist = 'https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt';
+  const blacklist = 'https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt'; // this is a test
   const blockedDomains = new Set();
   let listReady = false;
   const pendingElements = [];
