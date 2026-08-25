@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         Big Rat Ad Replacer
+// @name         big rat = no ad
 // @namespace    http://tampermonkey.net/
-// @version      7.0.0
-// @description  Replaces ads with a big rat. You're welcome.
-// @author       You
+// @version      v1.2
+// @description  biig rat
+// @author       Iunno
 // @match        *://*/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_notification
