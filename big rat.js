@@ -6,7 +6,6 @@
 // @author       iunno
 // @match        *://*/*
 // @grant        GM_xmlhttpRequest
-// @exclude      roblox.com
 // @connect      raw.githubusercontent.com
 // @run-at       document-start
 // ==/UserScript==
