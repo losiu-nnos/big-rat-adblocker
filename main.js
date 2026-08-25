@@ -11,8 +11,8 @@
 // @grant        GM_setValue
 // @grant        GM_info
 // @connect      raw.githubusercontent.com
-// @updateURL    https://github.com/losiu-nnos/big-rat-adblocker/blob/main/main.js
-// @downloadURL  https://github.com/losiu-nnos/big-rat-adblocker/blob/main/main.js
+// @updateURL    https://raw.githubusercontent.com/losiu-nnos/big-rat-adblocker/main/main.js
+// @downloadURL  https://raw.githubusercontent.com/losiu-nnos/big-rat-adblocker/main/main.js
 // @run-at       document-start
 // ==/UserScript==
 
