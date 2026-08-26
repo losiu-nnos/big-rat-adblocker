@@ -1,45 +1,45 @@
 // ==UserScript==
 // @name         big rat = no ad
 // @namespace    http://tampermonkey.net/
-// @version      v1.3
+// @version      v1.1
 // @description  biig rat
 // @author       Iunno
 // @match        *://*/*
-// @exclude      https://www.google.com/recaptcha/*
-// @exclude      https://recaptcha.net/recaptcha/*
-// @exclude      https://www.recaptcha.net/recaptcha/*
-// @exclude      https://api2.recaptcha.net/*
-// @exclude      https://hcaptcha.com/*
-// @exclude      https://www.hcaptcha.com/*
-// @exclude      https://newassets.hcaptcha.com/*
-// @exclude      https://imgs.hcaptcha.com/*
-// @exclude      https://js.hcaptcha.com/*
-// @exclude      https://api.hcaptcha.com/*
-// @exclude      https://accounts.hcaptcha.com/*
-// @exclude      https://funcaptcha.com/*
-// @exclude      https://www.funcaptcha.com/*
-// @exclude      https://client-api.arkoselabs.com/*
-// @exclude      https://api.funcaptcha.com/*
-// @exclude      https://roblox-api.arkoselabs.com/*
-// @exclude      https://iframe.arkoselabs.com/*
-// @exclude      https://turnstile.cloudflare.com/*
-// @exclude      https://challenges.cloudflare.com/*
-// @exclude      https://captcha.qcloud.com/*
-// @exclude      https://geo.captcha-delivery.com/*
-// @exclude      https://capgoo.com/*
-// @exclude      https://api.capmonster.cloud/*
-// @exclude      https://2captcha.com/*
-// @exclude      https://www.2captcha.com/*
-// @exclude      https://anti-captcha.com/*
-// @exclude      https://www.anti-captcha.com/*
-// @exclude      https://azcaptcha.com/*
-// @exclude      https://deathbycaptcha.com/*
-// @exclude      https://www.deathbycaptcha.com/*
-// @exclude      https://captchaai.com/*
-// @exclude      https://nopecha.com/*
-// @exclude      https://www.nopecha.com/*
-// @exclude      https://solver.ninja/*
-// @exclude      https://captcha.com/*
+// @exclude https://www.google.com/recaptcha/*
+// @exclude https://recaptcha.net/recaptcha/*
+// @exclude https://www.recaptcha.net/recaptcha/*
+// @exclude https://api2.recaptcha.net/*
+// @exclude https://hcaptcha.com/*
+// @exclude https://www.hcaptcha.com/*
+// @exclude https://newassets.hcaptcha.com/*
+// @exclude https://imgs.hcaptcha.com/*
+// @exclude https://js.hcaptcha.com/*
+// @exclude https://api.hcaptcha.com/*
+// @exclude https://accounts.hcaptcha.com/*
+// @exclude https://funcaptcha.com/*
+// @exclude https://www.funcaptcha.com/*
+// @exclude https://client-api.arkoselabs.com/*
+// @exclude https://api.funcaptcha.com/*
+// @exclude https://roblox-api.arkoselabs.com/*
+// @exclude https://iframe.arkoselabs.com/*
+// @exclude https://turnstile.cloudflare.com/*
+// @exclude https://challenges.cloudflare.com/*
+// @exclude https://captcha.qcloud.com/*
+// @exclude https://geo.captcha-delivery.com/*
+// @exclude https://capgoo.com/*
+// @exclude https://api.capmonster.cloud/*
+// @exclude https://2captcha.com/*
+// @exclude https://www.2captcha.com/*
+// @exclude https://anti-captcha.com/*
+// @exclude https://www.anti-captcha.com/*
+// @exclude https://azcaptcha.com/*
+// @exclude https://deathbycaptcha.com/*
+// @exclude https://www.deathbycaptcha.com/*
+// @exclude https://captchaai.com/*
+// @exclude https://nopecha.com/*
+// @exclude https://www.nopecha.com/*
+// @exclude https://solver.ninja/*
+// @exclude https://captcha.com/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_notification
 // @grant        GM_getValue
@@ -62,7 +62,7 @@
 // @run-at       document-start
 // ==/UserScript==
 
-(function () {
+(function () { // reverted to v1.1
   'use strict';
 
   const bigrat = 'https://bigrat.monster/media/bigrat_full.jpg';
